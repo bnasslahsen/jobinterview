@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+
+	<h2>Question / Response</h2>
+
+
+	<table class="table table-striped" th:object="${QRDTO}">
+		<tr>
+			<th>Question</th>
+			<td><b th:text="*{question}"></b></td>
+		</tr>
+		<tr>
+			<th>Response</th>
+			<td th:text="*{answer}" /></td>
+		</tr>
+	</table>
+
+	<div class="form-actions pull-right">
+		<input type="button" class="btn btn-info" value="Edit Question"
+			th:onclick="'window.location.href=\'' + @{{id}/edit(id=${QRDTO.id})} + '\''" />
+		<input type="button" class="btn btn-danger" value="Previous page"
+			th:onclick="'history.go(-1);'" /> 
+	</div>
+
+</body>
+
+</html>

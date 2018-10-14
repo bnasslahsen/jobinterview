@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+
+	<h2>Question</h2>
+	<form th:object="${QRDTO}" class="form-horizontal" id="add-owner-form"
+		method="post">
+		<div class="form-group has-feedback">
+			<input
+				th:replace="~{fragments/inputField :: input ('Question', 'question', 'text')}" />
+			<input
+				th:replace="~{fragments/inputField :: input ('Answer', 'answer', 'text')}" />
+			<input
+				th:replace="~{fragments/selectField :: select ('domain', 'domainId', ${types})}" />
+		</div>
+
+		<div class="form-actions pull-right">
+			<button th:with="text=TOTO ? 'Add Question' : 'Update Question'"
+				class="btn btn-info" type="submit" th:text="${text}">Add
+				Question</button>
+			<a th:href="@{'/qrs/find'}" href="findOwners.html"
+				class="btn btn-danger">Back to Search</a>
+		</div>
+	</form>
+</body>
+</html>
