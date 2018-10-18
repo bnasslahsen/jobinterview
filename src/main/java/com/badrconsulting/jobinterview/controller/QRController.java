@@ -1,6 +1,7 @@
 package com.badrconsulting.jobinterview.controller;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.badrconsulting.jobinterview.controller.util.Pager;
+import com.badrconsulting.jobinterview.controller.util.SupportedLanguages;
 import com.badrconsulting.jobinterview.repository.DomainRepository;
 import com.badrconsulting.jobinterview.service.QRService;
 import com.badrconsulting.jobinterview.service.dto.QRDTO;
@@ -38,10 +41,12 @@ class QRController {
     private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "qrs/createOrUpdateQuestionForm";
     private final  QRService qRService;
     private final  DomainRepository domainRepository;
+    private final LocaleResolver localeResolver;
 
-    public QRController(QRService qRService,DomainRepository domainRepository) {
+    public QRController(QRService qRService,DomainRepository domainRepository,LocaleResolver localeResolver) {
     	this.domainRepository = domainRepository;
         this.qRService = qRService;
+        this.localeResolver=localeResolver;
     }
 
     @InitBinder
@@ -84,7 +89,7 @@ class QRController {
 
     @GetMapping("/qrs")
     public String processFindForm(@RequestParam("pageSize") Optional<Integer> pageSize,
-            @RequestParam("page") Optional<Integer> page, QRDTO qrDTO, BindingResult result, Map<String, Object> model) {
+            @RequestParam("page") Optional<Integer> page, QRDTO qrDTO, BindingResult result, Map<String, Object> model, Locale locale) {
 
         // allow parameterless GET request for /qrs to return all records
         if (qrDTO.getQuestion() == null) {
@@ -100,8 +105,12 @@ class QRController {
         // prevent exception), return initial size. Otherwise, return value of
         // param. decreased by 1.
         int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
+        
+        String lang = locale.getLanguage();
+        if(!SupportedLanguages.contains(lang))
+        	lang = Locale.ENGLISH.toString();
 
-        Page<QRDTO> results = this.qRService.searchByDomaineNameForLanguage("java","en", PageRequest.of(evalPage, evalPageSize));
+        Page<QRDTO> results = this.qRService.searchByDomaineNameForLanguage("java",lang, PageRequest.of(evalPage, evalPageSize));
         Pager pager = new Pager(results.getTotalPages(), results.getNumber(), BUTTONS_TO_SHOW);
 
         if (results.getSize()==0) {

@@ -44,21 +44,26 @@
                       </a>
                   </li>
   
-                  <li th:replace="::menuItem ('/','home','home page','home','Home')">
+                  <li th:replace="::menuItem ('/','home','home page','home',#{navbar.home})">
                       <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
                       <span>Home</span>
                   </li>
   
-                  <li th:replace="::menuItem ('/qrs/find','owners','find owners','search','Find owners')">
+                  <li th:replace="::menuItem ('/qrs/find','search','find owners','search',#{navbar.hr})">
                       <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                       <span>Find Questions</span>
                   </li>
   
-                  <li th:replace="::menuItem ('/qrs/new','vets','Add Questions','th-list','Add Questions')">
+                  <li th:replace="::menuItem ('/qrs/new','add-qr','Add Questions','th-list',#{navbar.finance})">
                       <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                       <span>Add Questions</span>
                   </li>
   
+                  <li th:replace="::menuItem ('/qrs/new','add-qr','Add Questions','th-list',#{navbar.unix})">
+                      <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                      <span>Add Questions</span>
+                  </li>
+                  
                   <li th:replace="::menuItem ('/oups','error','trigger a RuntimeException to see how it is handled','warning-sign','Error')">
                       <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
                       <span>Error</span>
