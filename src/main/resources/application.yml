@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    schema: classpath*:db/${database}/schema.sql
+    data: classpath*:db/${database}/data.sql
+    url: jdbc:mysql://localhost/jobinterview
+    username: root
+    password: admin
+    initialization-mode: always
+  thymeleaf:
+    cache: false
+    check-template: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+  jpa:
+    hibernate:
+      ddl-auto: update
+  messages:
+    basename: messages/messages
+  resources:
+    cache:
+      cachecontrol:
+        max-age: 12h
+management:
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: '*'
+logging:
+  level:
+    root: WARN
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql: INFO
+    
+database: mysql
