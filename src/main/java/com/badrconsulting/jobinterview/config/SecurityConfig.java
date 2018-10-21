@@ -21,19 +21,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/", "/resources/**", "/js/**", "/error/**", "/css/**",
-						"/img/**", "/webjars/**")
-				.permitAll().antMatchers("/user/**").hasRole("USER").anyRequest()
-				.authenticated().and().formLogin().loginPage("/login").permitAll().and()
+						"/img/**", "/webjars/**").permitAll()
+				.antMatchers("/admin/**").hasRole("ADMIN")
+		        .antMatchers("/admin**").authenticated()
+                .anyRequest().permitAll()
+				.and().formLogin().loginPage("/login").permitAll().and()
 				.logout().invalidateHttpSession(true).clearAuthentication(true)
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 				.logoutSuccessUrl("/login?logout").permitAll().and().exceptionHandling()
-				.accessDeniedHandler(accessDeniedHandler);
+				.accessDeniedHandler(accessDeniedHandler).and()
+                .csrf().disable();
 	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("user")
-				.password(passwordEncoder().encode("password")).roles("USER").and()
+		auth.inMemoryAuthentication()
 				.withUser("admin").password(passwordEncoder().encode("admin"))
 				.roles("ADMIN");
 	}

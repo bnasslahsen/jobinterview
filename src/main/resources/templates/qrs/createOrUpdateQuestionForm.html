@@ -16,7 +16,7 @@
 		</div>
 
 		<div class="form-actions pull-right">
-			<button th:with="text=TOTO ? 'Add Question' : 'Update Question'"
+			<button sec:authorize="hasRole('ROLE_ADMIN')" th:with="text=TOTO ? 'Add Question' : 'Update Question'"
 				class="btn btn-info" type="submit" th:text="${text}">Add
 				Question</button>
 			<a th:href="@{'/qrs/find'}" href="findOwners.html"

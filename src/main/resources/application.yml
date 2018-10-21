@@ -36,7 +36,7 @@ management:
         include: '*'
 logging:
   level:
-    root: WARN
+    root: INFO
     org.springframework.web: INFO
     org.springframework.security: INFO
     org.hibernate.SQL: INFO

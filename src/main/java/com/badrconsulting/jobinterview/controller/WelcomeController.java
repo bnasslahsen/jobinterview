@@ -11,9 +11,9 @@ class WelcomeController {
 		return "welcome";
 	}
 
-	@GetMapping("/user")
-	public String userIndex() {
-		return "user/index";
+	@GetMapping("/admin")
+	public String adminIndex() {
+		return "admin/index";
 	}
 
 	@GetMapping("/login")

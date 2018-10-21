@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.badrconsulting.jobinterview.controller.util.Pager;
@@ -46,13 +45,10 @@ class QRController {
 
 	private final DomainRepository domainRepository;
 
-	private final LocaleResolver localeResolver;
 
-	public QRController(QRService qRService, DomainRepository domainRepository,
-			LocaleResolver localeResolver) {
+	public QRController(QRService qRService, DomainRepository domainRepository) {
 		this.domainRepository = domainRepository;
 		this.qRService = qRService;
-		this.localeResolver = localeResolver;
 	}
 
 	@InitBinder
