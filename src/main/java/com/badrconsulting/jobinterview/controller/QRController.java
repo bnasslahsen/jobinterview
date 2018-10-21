@@ -32,136 +32,151 @@ import com.badrconsulting.jobinterview.service.dto.QRDTO;
 @Controller("/qrs")
 class QRController {
 
-    private static final int BUTTONS_TO_SHOW = 5;
-    private static final int INITIAL_PAGE = 0;
-    private static final int INITIAL_PAGE_SIZE = 5;
-    private static final int[] PAGE_SIZES = {5, 10, 20};
-    
-    
-    private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "qrs/createOrUpdateQuestionForm";
-    private final  QRService qRService;
-    private final  DomainRepository domainRepository;
-    private final LocaleResolver localeResolver;
+	private static final int BUTTONS_TO_SHOW = 5;
 
-    public QRController(QRService qRService,DomainRepository domainRepository,LocaleResolver localeResolver) {
-    	this.domainRepository = domainRepository;
-        this.qRService = qRService;
-        this.localeResolver=localeResolver;
-    }
+	private static final int INITIAL_PAGE = 0;
 
-    @InitBinder
-    public void setAllowedFields(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
-    }
+	private static final int INITIAL_PAGE_SIZE = 5;
 
-    @ModelAttribute("types")
-    public Collection<Long> populatePetTypes() {
-        return this.domainRepository.findAll().stream().map(domain -> domain.getId()).collect( Collectors.toList());
-    }
-    
-    @InitBinder("QRDTO")
-    public void initOwnerBinder(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
-    }
-    
-    @GetMapping("/qrs/new")
-    public String initCreationForm(Map<String, Object> model) {
-    	QRDTO qrDTO = new QRDTO();
-        model.put("QRDTO", qrDTO);
-        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-    }
+	private static final int[] PAGE_SIZES = { 5, 10, 20 };
 
-    @PostMapping("/qrs/new")
-    public String processCreationForm(@Valid QRDTO qrDTO, BindingResult result) {
-        if (result.hasErrors()) {
-            return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-        } else {
-        	qrDTO = this.qRService.save(qrDTO);
-            return "redirect:/qrs/" + qrDTO.getId();
-        }
-    }
+	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "qrs/createOrUpdateQuestionForm";
 
-    @GetMapping("/qrs/find")
-    public String initFindForm(Map<String, Object> model) {
-        model.put("QRDTO", new QRDTO());
-        return "qrs/findQuestions";
-    }
+	private final QRService qRService;
 
-    @GetMapping("/qrs")
-    public String processFindForm(@RequestParam("pageSize") Optional<Integer> pageSize,
-            @RequestParam("page") Optional<Integer> page, QRDTO qrDTO, BindingResult result, Map<String, Object> model, Locale locale) {
+	private final DomainRepository domainRepository;
 
-        // allow parameterless GET request for /qrs to return all records
-        if (qrDTO.getQuestion() == null) {
-            qrDTO.setQuestion(""); // empty string signifies broadest possible search
-        }
+	private final LocaleResolver localeResolver;
 
-        // find qRService by last name
-        
-        // Evaluate page size. If requested parameter is null, return initial
-        // page size
-        int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
-        // Evaluate page. If requested parameter is null or less than 0 (to
-        // prevent exception), return initial size. Otherwise, return value of
-        // param. decreased by 1.
-        int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
-        
-        String lang = locale.getLanguage();
-        if(!SupportedLanguages.contains(lang))
-        	lang = Locale.ENGLISH.toString();
+	public QRController(QRService qRService, DomainRepository domainRepository,
+			LocaleResolver localeResolver) {
+		this.domainRepository = domainRepository;
+		this.qRService = qRService;
+		this.localeResolver = localeResolver;
+	}
 
-        Page<QRDTO> results = this.qRService.searchByDomaineNameForLanguage("java",lang, PageRequest.of(evalPage, evalPageSize));
-        Pager pager = new Pager(results.getTotalPages(), results.getNumber(), BUTTONS_TO_SHOW);
+	@InitBinder
+	public void setAllowedFields(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
 
-        if (results.getSize()==0) {
-            // no qRService found
-            result.rejectValue("question", "notFound", "not found");
-            model.put("QRDTO", new QRDTO());
-            return "qrs/findQuestions";
-        } else if (results.getSize() == 1) {
-            // 1 qrDTO found
-            qrDTO = results.iterator().next();
-            return "redirect:/qrs/" + qrDTO.getId();
-        } else {
-            // multiple qRService found
-        	model.put("selections", results);
-        	model.put("selectedPageSize", evalPageSize);
-        	model.put("pageSizes", PAGE_SIZES);
-        	model.put("pager", pager);
+	@ModelAttribute("types")
+	public Collection<Long> populatePetTypes() {
+		return this.domainRepository.findAll().stream().map(domain -> domain.getId())
+				.collect(Collectors.toList());
+	}
 
-            return "qrs/questionsList";
-        }
-    }
+	@InitBinder("QRDTO")
+	public void initOwnerBinder(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
 
-    @GetMapping("/qrs/{qrDTOId}/edit")
-    public String initUpdateQRDTOForm(@PathVariable("qrDTOId") long qrDTOId, Model model) {
-        QRDTO qrDTO = this.qRService.findOne(qrDTOId);
-        model.addAttribute(qrDTO);
-        return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-    }
+	@GetMapping("/qrs/new")
+	public String initCreationForm(Map<String, Object> model) {
+		QRDTO qrDTO = new QRDTO();
+		model.put("QRDTO", qrDTO);
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
 
-    @PostMapping("/qrs/{qrDTOId}/edit")
-    public String processUpdateQRDTOForm(@Valid QRDTO qrDTO, BindingResult result, @PathVariable("qrDTOId") long qrDTOId) {
-        if (result.hasErrors()) {
-            return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
-        } else {
-            qrDTO.setId(qrDTOId);
-            this.qRService.save(qrDTO);
-            return "redirect:/qrs/{qrDTOId}";
-        }
-    }
+	@PostMapping("/qrs/new")
+	public String processCreationForm(@Valid QRDTO qrDTO, BindingResult result) {
+		if (result.hasErrors()) {
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+		else {
+			qrDTO = this.qRService.save(qrDTO);
+			return "redirect:/qrs/" + qrDTO.getId();
+		}
+	}
 
-    /**
-     * Custom handler for displaying an qrDTO.
-     *
-     * @param qrDTOId the ID of the qrDTO to display
-     * @return a ModelMap with the model attributes for the view
-     */
-    @GetMapping("/qrs/{qrDTOId}")
-    public ModelAndView showQRDTO(@PathVariable("qrDTOId") long qrDTOId) {
-        ModelAndView mav = new ModelAndView("qrs/questionDetails");
-        mav.addObject(this.qRService.findOne(qrDTOId));
-        return mav;
-    }
+	@GetMapping("/qrs/find")
+	public String initFindForm(Map<String, Object> model) {
+		model.put("QRDTO", new QRDTO());
+		return "qrs/findQuestions";
+	}
+
+	@GetMapping("/qrs")
+	public String processFindForm(@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer> page, QRDTO qrDTO,
+			BindingResult result, Map<String, Object> model, Locale locale) {
+
+		// allow parameterless GET request for /qrs to return all records
+		if (qrDTO.getQuestion() == null) {
+			qrDTO.setQuestion(""); // empty string signifies broadest possible search
+		}
+
+		// find qRService by last name
+
+		// Evaluate page size. If requested parameter is null, return initial
+		// page size
+		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
+		// Evaluate page. If requested parameter is null or less than 0 (to
+		// prevent exception), return initial size. Otherwise, return value of
+		// param. decreased by 1.
+		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
+
+		String lang = locale.getLanguage();
+		if (!SupportedLanguages.contains(lang))
+			lang = Locale.ENGLISH.toString();
+
+		Page<QRDTO> results = this.qRService.searchByDomaineNameForLanguage("java", lang,
+				PageRequest.of(evalPage, evalPageSize));
+		Pager pager = new Pager(results.getTotalPages(), results.getNumber(),
+				BUTTONS_TO_SHOW);
+
+		if (results.getSize() == 0) {
+			// no qRService found
+			result.rejectValue("question", "notFound", "not found");
+			model.put("QRDTO", new QRDTO());
+			return "qrs/findQuestions";
+		}
+		else if (results.getSize() == 1) {
+			// 1 qrDTO found
+			qrDTO = results.iterator().next();
+			return "redirect:/qrs/" + qrDTO.getId();
+		}
+		else {
+			// multiple qRService found
+			model.put("selections", results);
+			model.put("selectedPageSize", evalPageSize);
+			model.put("pageSizes", PAGE_SIZES);
+			model.put("pager", pager);
+
+			return "qrs/questionsList";
+		}
+	}
+
+	@GetMapping("/qrs/{qrDTOId}/edit")
+	public String initUpdateQRDTOForm(@PathVariable("qrDTOId") long qrDTOId,
+			Model model) {
+		QRDTO qrDTO = this.qRService.findOne(qrDTOId);
+		model.addAttribute(qrDTO);
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+
+	@PostMapping("/qrs/{qrDTOId}/edit")
+	public String processUpdateQRDTOForm(@Valid QRDTO qrDTO, BindingResult result,
+			@PathVariable("qrDTOId") long qrDTOId) {
+		if (result.hasErrors()) {
+			return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+		}
+		else {
+			qrDTO.setId(qrDTOId);
+			this.qRService.save(qrDTO);
+			return "redirect:/qrs/{qrDTOId}";
+		}
+	}
+
+	/**
+	 * Custom handler for displaying an qrDTO.
+	 * @param qrDTOId the ID of the qrDTO to display
+	 * @return a ModelMap with the model attributes for the view
+	 */
+	@GetMapping("/qrs/{qrDTOId}")
+	public ModelAndView showQRDTO(@PathVariable("qrDTOId") long qrDTOId) {
+		ModelAndView mav = new ModelAndView("qrs/questionDetails");
+		mav.addObject(this.qRService.findOne(qrDTOId));
+		return mav;
+	}
 
 }

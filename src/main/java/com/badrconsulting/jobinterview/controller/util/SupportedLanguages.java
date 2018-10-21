@@ -1,6 +1,7 @@
 package com.badrconsulting.jobinterview.controller.util;
 
 public enum SupportedLanguages {
+
 	FRENCH("fr"), ENGLISH("en");
 
 	private String abbreviation;
@@ -21,4 +22,5 @@ public enum SupportedLanguages {
 		}
 		return false;
 	}
+
 }

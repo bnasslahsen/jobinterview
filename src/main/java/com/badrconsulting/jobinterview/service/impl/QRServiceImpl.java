@@ -35,7 +35,6 @@ public class QRServiceImpl implements QRService {
 
 	/**
 	 * Save a qR.
-	 *
 	 * @param qRDTO the entity to save
 	 * @return the persisted entity
 	 */
@@ -50,7 +49,6 @@ public class QRServiceImpl implements QRService {
 
 	/**
 	 * Get all the qRS.
-	 *
 	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
@@ -63,7 +61,6 @@ public class QRServiceImpl implements QRService {
 
 	/**
 	 * Get one qR by id.
-	 *
 	 * @param id the id of the entity
 	 * @return the entity
 	 */
@@ -77,7 +74,6 @@ public class QRServiceImpl implements QRService {
 
 	/**
 	 * Delete the qR by id.
-	 *
 	 * @param id the id of the entity
 	 */
 	@Override
@@ -88,8 +84,7 @@ public class QRServiceImpl implements QRService {
 
 	/**
 	 * Search for the qR corresponding to the query.
-	 *
-	 * @param query    the query of the search
+	 * @param query the query of the search
 	 * @param pageable the pagination information
 	 * @return the list of entities
 	 */
@@ -110,8 +105,11 @@ public class QRServiceImpl implements QRService {
 	}
 
 	@Override
-	public Page<QRDTO> searchByDomaineNameForLanguage(String domaineName, String language, Pageable pageable) {
-		Page<QR> qrs = qRRepository.searchByDomaineNameForLanguage(domaineName, language, pageable);
+	public Page<QRDTO> searchByDomaineNameForLanguage(String domaineName, String language,
+			Pageable pageable) {
+		Page<QR> qrs = qRRepository.searchByDomaineNameForLanguage(domaineName, language,
+				pageable);
 		return qrs.map(qRMapper::toDto);
 	}
+
 }
